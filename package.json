@@ -1,5 +1,7 @@
 {
+	"icon": "assets/AngelDocLogo.png",
 	"name": "angeldoc-vscode",
+	"publisher": "gitpocalypse",
 	"displayName": "angeldoc-vscode",
 	"description": "An open source replacement for GhostDoc",
 	"repository": "https://github.com/jpfeiffer16/angeldoc-vscode.git",
@@ -45,7 +47,7 @@
 		"test": "node ./out/test/runTest.js"
 	},
 	"devDependencies": {
-		"@types/vscode": "^1.49.0",
+		"@types/vscode": "^1.46.0",
 		"@types/glob": "^7.1.1",
 		"@types/mocha": "^7.0.2",
 		"@types/node": "^13.11.0",
