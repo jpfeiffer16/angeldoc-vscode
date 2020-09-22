@@ -1,6 +1,6 @@
-# angeldoc-vscode
-
 ![Logo](assets/AngelDocLogo.png)
+
+# angeldoc-vscode
 
 AngelDoc is an open-source replacement for GhostDoc.
 
@@ -20,16 +20,11 @@ Currently supported are:
 
 vscode ^1.46.0
 
-<!-- ## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
+## Extension Settings
 
 This extension contributes the following settings:
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something -->
+* `angeldoc-vscode.insertxmldoconslash`: enable/disable inserting of xmldocs when inserting three consecutive slashes('/')
 
 ## Known Issues
 

@@ -11,16 +11,30 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onStartupFinished"
+		"onLanguage:csharp"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
+				"command": "angeldoc-vscode.insertxmldoc",
+				"title": "Insert XML Doc"
+			},
+			{
 				"command": "angeldoc-vscode.installangeldoc",
 				"title": "Install AngelDoc"
 			}
-		]
+		],
+		"configuration": {
+			"title": "angeldoc-vscode",
+			"properties": {
+				"angeldoc.insertxmldoconslash": {
+					"type": "boolean",
+					"default": true,
+					"description": "Insert xml docs when 3 slashes are entered on the line above a symbol."
+				}
+			}
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",

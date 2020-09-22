@@ -16,6 +16,10 @@ export async function activate(context: vscode.ExtensionContext) {
 		await installAngelDoc();
 	});
 	context.subscriptions.push(disposable);
+	disposable = vscode.commands.registerCommand('angeldoc-vscode.insertxmldoc', async () => {
+		await insertXmlDoc();
+	});
+	context.subscriptions.push(disposable);
 	await ensureInstalled();
 	console.log('installed');
 	let repeatedSlashes = 0;
@@ -28,46 +32,18 @@ export async function activate(context: vscode.ExtensionContext) {
 				repeatedSlashes = 0;
 			}
 			if (repeatedSlashes === 3) {
-				if (vscode.window.activeTextEditor) {
+				if (
+					vscode.workspace.getConfiguration('angeldoc').get('insertxmldoconslash')) {
 					const editor = vscode.window.activeTextEditor;
-
-					vscode.window.activeTextEditor?.edit(editBuilder =>
-						editBuilder.delete(
-							new vscode.Range(editor.selection.active.line, 0, editor.selection.active.line + 1, 0)));
-
-					const proc = childProc.spawn(
-						'dotnet',
-						[
-							angelDocDllPath,
-							'-',
-							'gendoccsharp',
-							(editor.selection.active.line + 1).toString()
-						], {
-						stdio: 'pipe'
-					}
-					);
-
-					let output = '';
-
-					proc.stdout.on('data', data => {
-						output += data.toString();
-					});
-					proc.stdout.on('end', () => {
-						editor.edit(editBuilder =>
-							editBuilder.insert(new vscode.Position(editor.selection.active.line, 0), output + '\n'));
-						vscode.commands.executeCommand('editor.action.formatDocument');
-					});
-					proc.stderr.on('data', data => {
-						console.error(data.toString());
-					});
-					proc.stdin.setDefaultEncoding('utf-8');
-					proc.stdin.write(editor.document.getText(), (err) => {
-						if (err) {
-							console.error(err);
-							return;
+					if (editor) {
+						if (editor.document.languageId === 'csharp')
+						{
+							vscode.window.activeTextEditor?.edit(editBuilder =>
+								editBuilder.delete(
+									new vscode.Range(editor.selection.active.line, 0, editor.selection.active.line + 1, 0)));
+							insertXmlDoc();
 						}
-						proc.stdin.end();
-					});
+					}
 				}
 			}
 		}
@@ -76,6 +52,50 @@ export async function activate(context: vscode.ExtensionContext) {
 
 export function deactivate() {
 	console.log('AngelDoc Deactivated.');
+}
+
+async function insertXmlDoc() {
+	if (vscode.window.activeTextEditor) {
+		const editor = vscode.window.activeTextEditor;
+		if (editor.document.languageId === 'csharp')
+		{
+			const proc = childProc.spawn(
+				'dotnet',
+				[
+					angelDocDllPath,
+					'-',
+					'gendoccsharp',
+					(editor.selection.active.line + 1).toString()
+				], {
+				stdio: 'pipe'
+			}
+			);
+
+			let output = '';
+
+			proc.stdout.on('data', data => {
+				output += data.toString();
+			});
+			proc.stdout.on('end', () => {
+				editor.edit(editBuilder =>
+					editBuilder.insert(new vscode.Position(editor.selection.active.line, 0), output + '\n'));
+				vscode.commands.executeCommand('editor.action.formatDocument');
+			});
+			proc.stderr.on('data', data => {
+				console.error(data.toString());
+			});
+			proc.stdin.setDefaultEncoding('utf-8');
+			proc.stdin.write(editor.document.getText(), (err) => {
+				if (err) {
+					console.error(err);
+					return;
+				}
+				proc.stdin.end();
+			});
+		}
+
+	}
+
 }
 
 async function ensureInstalled() {
