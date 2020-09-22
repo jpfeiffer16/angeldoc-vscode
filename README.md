@@ -2,6 +2,8 @@
 
 # angeldoc-vscode
 
+![Demo](assets/AngelDocVsCode.gif)
+
 AngelDoc is an open-source replacement for GhostDoc.
 
 ## Features
