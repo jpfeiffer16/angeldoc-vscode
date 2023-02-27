@@ -17,11 +17,16 @@ export async function activate(context: vscode.ExtensionContext) {
 	});
 	context.subscriptions.push(disposable);
 	disposable = vscode.commands.registerCommand('angeldoc-vscode.insertxmldoc', async () => {
-		await insertXmlDoc();
+		const editor = vscode.window.activeTextEditor;
+		if (editor) {
+			const line = new vscode.Range(editor.selection.active.line, 0, editor.selection.active.line + 1, 0);
+			const lineText = editor.document.getText(line);
+			const whitespace = lineText.substring(0, lineText.length - lineText.trimLeft().length);
+			await insertXmlDoc(whitespace);
+		}
 	});
 	context.subscriptions.push(disposable);
 	await ensureInstalled();
-	console.log('installed');
 	let repeatedSlashes = 0;
 	vscode.workspace.onDidChangeTextDocument(e => {
 		if (e.contentChanges) {
@@ -38,10 +43,13 @@ export async function activate(context: vscode.ExtensionContext) {
 					if (editor) {
 						if (editor.document.languageId === 'csharp')
 						{
+							const line = new vscode.Range(editor.selection.active.line, 0, editor.selection.active.line + 1, 0);
+							const lineText = editor.document.getText(line);
+							const whitespace = lineText.substring(0, lineText.length - lineText.trimLeft().length);
 							vscode.window.activeTextEditor?.edit(editBuilder =>
 								editBuilder.delete(
-									new vscode.Range(editor.selection.active.line, 0, editor.selection.active.line + 1, 0)));
-							insertXmlDoc();
+									new vscode.Range(editor.selection.active.line, 0, editor.selection.active.line + 1, 0)))
+									.then(() => insertXmlDoc(whitespace));
 						}
 					}
 				}
@@ -54,7 +62,7 @@ export function deactivate() {
 	console.log('AngelDoc Deactivated.');
 }
 
-async function insertXmlDoc() {
+async function insertXmlDoc(whitespace: string) {
 	if (vscode.window.activeTextEditor) {
 		const editor = vscode.window.activeTextEditor;
 		if (editor.document.languageId === 'csharp')
@@ -78,8 +86,8 @@ async function insertXmlDoc() {
 			});
 			proc.stdout.on('end', () => {
 				editor.edit(editBuilder =>
-					editBuilder.insert(new vscode.Position(editor.selection.active.line, 0), output + '\n'));
-				vscode.commands.executeCommand('editor.action.formatDocument');
+					editBuilder.insert(new vscode.Position(editor.selection.active.line, 0), output.split('\n').map(l => whitespace + l).join('\n') + '\n'))
+					.then(() => vscode.commands.executeCommand('editor.action.formatDocument'));
 			});
 			proc.stderr.on('data', data => {
 				console.error(data.toString());

@@ -5,7 +5,7 @@
 	"displayName": "angeldoc-vscode",
 	"description": "An open source replacement for GhostDoc",
 	"repository": "https://github.com/jpfeiffer16/angeldoc-vscode.git",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"engines": {
 		"vscode": "^1.46.0"
 	},
